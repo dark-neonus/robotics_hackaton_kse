@@ -59,7 +59,28 @@ void rotate180() {
   digitalWrite(MOTOR_LEFT_PIN2, LOW);
 }
 
+void rotateClockwise(int rotate_speed) {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, rotate_speed);
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, rotate_speed);
+  digitalWrite(motorRightPin1, LOW);
+  digitalWrite(motorRightPin2, HIGH);
+  digitalWrite(motorLeftPin1, HIGH);
+  digitalWrite(motorLeftPin2, LOW);
+ }
+
+
+ void rotateCounterClockwise(int rotate_speed) {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, rotate_speed);
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, rotate_speed);
+  digitalWrite(motorRightPin1, HIGH);
+  digitalWrite(motorRightPin2, LOW);
+  digitalWrite(motorLeftPin1, LOW);
+  digitalWrite(motorLeftPin2, HIGH);
+ }
+
 void backward() {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, speed);
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, speed);
   digitalWrite(MOTOR_RIGHT_PIN1, LOW);
   digitalWrite(MOTOR_RIGHT_PIN2, HIGH);
   digitalWrite(MOTOR_LEFT_PIN1, LOW);
