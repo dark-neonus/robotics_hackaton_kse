@@ -1,38 +1,34 @@
 
 #include "move.h"
 
-int SENSOR_0_PIN = 2;
-int SENSOR_1_PIN = 3;
-int SENSOR_2_PIN = 4;
-int SENSOR_3_PIN = 5;
-int SENSOR_4_PIN = 6;
+#define SENSOR_0_PIN 2
+#define SENSOR_1_PIN 3
+#define SENSOR_2_PIN 4
+#define SENSOR_3_PIN 5
+#define SENSOR_4_PIN 6
 
-int L2 = SENSOR_0_PIN;
-int L1 = SENSOR_1_PIN;
-int C0 = SENSOR_2_PIN;
-int R2 = SENSOR_3_PIN;
-int R1 = SENSOR_4_PIN;
-
-int MOTOR_LEFT_PIN = 8;
-int MOTOR_RIGHT_PIN = 9;
+#define L2 SENSOR_0_PIN
+#define L1 SENSOR_1_PIN
+#define C0 SENSOR_2_PIN
+#define R2 SENSOR_3_PIN
+#define R1 SENSOR_4_PIN
 
 #pragma region Setup
 
-void setup_pins() {
+void setup_sensor() {
     pinMode(SENSOR_0_PIN, INPUT);
     pinMode(SENSOR_1_PIN, INPUT);
     pinMode(SENSOR_2_PIN, INPUT);
     pinMode(SENSOR_3_PIN, INPUT);
     pinMode(SENSOR_4_PIN, INPUT);
-    pinMode(MOTOR_LEFT_PIN, OUTPUT);
-    pinMode(MOTOR_RIGHT_PIN, OUTPUT);
     Serial.println("Pins initialized");
 }
 
 void setup() 
 {
   Serial.begin(115200);
-  setup_pins();
+  setup_sensor();
+  setup_motors();
 }
 
 #pragma endregion
@@ -69,6 +65,6 @@ void readSensors(bool print = false, bool nice = false) {
 void loop() 
 {
   readSensors(true, true);
-  rotate180();
+  forward(50);
   delay(150);
 }
