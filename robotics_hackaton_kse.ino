@@ -10,8 +10,12 @@
 #define L2 SENSOR_0_PIN
 #define L1 SENSOR_1_PIN
 #define C0 SENSOR_2_PIN
-#define R2 SENSOR_3_PIN
-#define R1 SENSOR_4_PIN
+#define R1 SENSOR_3_PIN
+#define R2 SENSOR_4_PIN
+
+const int baseSpeed = 120;
+const int turnAdjust = 40;
+
 
 #pragma region Setup
 
@@ -65,6 +69,56 @@ void readSensors(bool print = false, bool nice = false) {
 void loop() 
 {
   readSensors(true, true);
-  forward(50);
-  delay(150);
+  if (C0) {
+    // Чітко на лінії — їдемо прямо
+    moveForward(baseSpeed, baseSpeed);
+  }
+  else if (L1) {
+    // Трохи лівіше
+    moveForward(baseSpeed - turnAdjust, baseSpeed + turnAdjust);
+  }
+  else if (R1) {
+    // Трохи правіше
+    moveForward(baseSpeed + turnAdjust, baseSpeed - turnAdjust);
+  }
+  else if (L2) {
+    // Сильно ліво
+    moveForward(baseSpeed - 2 * turnAdjust, baseSpeed + 2 * turnAdjust);
+  }
+  else if (R2) {
+    // Сильно право
+    moveForward(baseSpeed + 2 * turnAdjust, baseSpeed - 2 * turnAdjust);
+  }
+  else {
+    // Лінію втрачено — виконуємо повернення
+    recoverToCenterLine();
+  }
+
+  delay(10);
+}
+
+void recoverToCenterLine() {
+  const int smallTurnSpeed = 100;
+  const int forwardSpeed = 80;
+
+  while (true) {
+    bool R1;
+
+    if (C0) break; // Знайшли центр — виходимо
+
+    if (L2 || L1) {
+      // Малий поворот ліворуч
+      moveForward(smallTurnSpeed - 40, smallTurnSpeed + 40);
+    }
+    else if (R1 || R2) {
+      // Малий поворот праворуч
+      moveForward(smallTurnSpeed + 40, smallTurnSpeed - 40);
+    }
+    else {
+      // Просто рух вперед, шукаємо
+      moveForward(forwardSpeed, forwardSpeed);
+    }
+
+    delay(100);
+  }
 }

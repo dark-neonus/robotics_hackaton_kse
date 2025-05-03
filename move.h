@@ -19,11 +19,21 @@ void setup_motors() {
   Serial.println("Motors initialized");
 }
 
-void forward(int speed = 150) {
-  analogWrite(MOTOR_RIGHT_ANALOG_PIN, speed);
-  analogWrite(MOTOR_LEFT_ANALOG_PIN, speed);
+// void forward(int speed = 150) {
+//   analogWrite(MOTOR_RIGHT_ANALOG_PIN, speed);
+//   analogWrite(MOTOR_LEFT_ANALOG_PIN, speed);
+//   digitalWrite(MOTOR_RIGHT_PIN1, HIGH);
+//   digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+//   digitalWrite(MOTOR_LEFT_PIN1, HIGH);
+//   digitalWrite(MOTOR_LEFT_PIN2, LOW);
+// }
+void moveForward(int leftSpeed, int rightSpeed) {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, constrain(leftSpeed, 0, 255));
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, constrain(rightSpeed, 0, 255));
+
   digitalWrite(MOTOR_RIGHT_PIN1, HIGH);
   digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+
   digitalWrite(MOTOR_LEFT_PIN1, HIGH);
   digitalWrite(MOTOR_LEFT_PIN2, LOW);
 }
