@@ -46,10 +46,10 @@ void readSensors(bool print = false, bool nice = false) {
 namespace Navigation {
   StackArray<Node> nodes;
   
-  void addNode(bool left, bool right, bool center) {
-      Node newNode(left, right, center);
-      nodes.push(newNode);
-  }
+  // void addNode(bool left, bool right, bool center) {
+  //     Node newNode(left, right, center);
+  //     nodes.push(newNode);
+  // }
 
   const int baseSpeed = 120;
   const int StampTime = 100;
@@ -57,6 +57,7 @@ namespace Navigation {
   void run() {
     MoveStamp current_move = MoveStamp(0, 0, 0);
     Node current_node = nodes.peek();
+
     while (!nodes.isEmpty()) {
       current_node = nodes.pop();
       if (!current_node.left_branch && !current_node.right_branch && !current_node.center_branch) {
@@ -72,9 +73,9 @@ namespace Navigation {
       if (current_node.center_branch) {
         current_move = MoveStamp(baseSpeed, 0, StampTime);
       } else if (current_node.right_branch) {
-        current_move = MoveStamp(baseSpeed, baseSpeed + 90, StampTime);
+        current_move = MoveStamp(baseSpeed, 90, StampTime);
       } else if (current_node.left_branch) {
-        current_move = MoveStamp(baseSpeed, baseSpeed - 90, StampTime);
+        current_move = MoveStamp(baseSpeed, -90, StampTime);
       }
 
       while (true) {
@@ -115,6 +116,7 @@ namespace Navigation {
           } else if (current_node.left_branch) {
             current_node.right_branch = false;
           }
+          nodes.push(current_node);
           break;
         }
         
@@ -159,7 +161,7 @@ void loop()
   sensor_sum = sensor_data[0] + sensor_data[1] + sensor_data[2] + sensor_data[3] + sensor_data[4];
   // move(100, 100);
   
-
+  Navigation::run();
 
   delay(10);
 }
