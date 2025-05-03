@@ -30,33 +30,32 @@ void setup_pins() {
 
 void setup() 
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   setup_pins();
 }
 
 #pragma endregion
 
 static int sensor_data[5];
-int* readSensors(bool print = false, bool nice = false) {
-  static int pinValues[5];
-  pinValues[0] = digitalRead(SENSOR_0_PIN);
-  pinValues[1] = digitalRead(SENSOR_1_PIN);
-  pinValues[2] = digitalRead(SENSOR_2_PIN);
-  pinValues[3] = digitalRead(SENSOR_3_PIN);
-  pinValues[4] = digitalRead(SENSOR_4_PIN);
+void readSensors(bool print = false, bool nice = false) {
+  sensor_data[0] = digitalRead(SENSOR_0_PIN);
+  sensor_data[1] = digitalRead(SENSOR_1_PIN);
+  sensor_data[2] = digitalRead(SENSOR_2_PIN);
+  sensor_data[3] = digitalRead(SENSOR_3_PIN);
+  sensor_data[4] = digitalRead(SENSOR_4_PIN);
   if (print) {
     // Print data separated by |
     // Serial.print("Sensor data: ");
     for (int i = 0; i < 5; i++) {
       if (nice) {
-        if (pinValues[i] == 0) {
+        if (sensor_data[i] == 0) {
           Serial.print("#");
         } else {
           Serial.print(".");
         }
       }
       else {
-        Serial.print(pinValues[i]);
+        Serial.print(sensor_data[i]);
         if (i < 4) {
             Serial.print(" | ");
         }
@@ -65,10 +64,10 @@ int* readSensors(bool print = false, bool nice = false) {
     }
     Serial.println();
   }
-  return pinValues;
 }
 
 void loop() 
 {
-  readSensors(true);
+  readSensors(true, true);
+  delay(100);
 }
