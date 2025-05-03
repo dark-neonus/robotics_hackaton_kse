@@ -1,3 +1,10 @@
+int motorRightPin1 = 8;
+int motorRightPin2 = 9;
+
+int motorLeftPin1 = 10;
+int motorLeftPin2 = 11;
+
+
 void forward() {
   digitalWrite(motorRightPin1, HIGH);
   digitalWrite(motorRightPin2, LOW);
