@@ -62,9 +62,19 @@ void readSensors(bool print = false, bool nice = false) {
   }
 }
 
+int delta_angle = 0;
+int speed = 0;
+bool direction_forward = true;
+
 void loop() 
 {
+  delta_angle = 0;
+  speed = 0;
+  direction_forward = true;
+
   readSensors(true, true);
-  forward(50);
+
+
+  // forward(50);
   delay(150);
 }
