@@ -1,4 +1,5 @@
 
+#include "move.h"
 
 int SENSOR_0_PIN = 2;
 int SENSOR_1_PIN = 3;
@@ -60,7 +61,6 @@ void readSensors(bool print = false, bool nice = false) {
             Serial.print(" | ");
         }
       }
-      
     }
     Serial.println();
   }
@@ -69,5 +69,6 @@ void readSensors(bool print = false, bool nice = false) {
 void loop() 
 {
   readSensors(true, true);
-  delay(100);
+  rotate180();
+  delay(150);
 }
