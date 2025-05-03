@@ -1,5 +1,6 @@
 
 #include "move.h"
+#include "navigation.h"
 
 #define SENSOR_0_PIN 2
 #define SENSOR_1_PIN 3
@@ -13,37 +14,13 @@
 #define R1 SENSOR_3_PIN
 #define R2 SENSOR_4_PIN
 
-const int baseSpeed = 120;
-const int turnAdjust = 40;
-
-
-#pragma region Setup
-
-void setup_sensor() {
-    pinMode(SENSOR_0_PIN, INPUT);
-    pinMode(SENSOR_1_PIN, INPUT);
-    pinMode(SENSOR_2_PIN, INPUT);
-    pinMode(SENSOR_3_PIN, INPUT);
-    pinMode(SENSOR_4_PIN, INPUT);
-    Serial.println("Pins initialized");
-}
-
-void setup() 
-{
-  Serial.begin(115200);
-  setup_sensor();
-  setup_motors();
-}
-
-#pragma endregion
-
 static int sensor_data[5];
 void readSensors(bool print = false, bool nice = false) {
-  sensor_data[0] = digitalRead(SENSOR_0_PIN);
-  sensor_data[1] = digitalRead(SENSOR_1_PIN);
-  sensor_data[2] = digitalRead(SENSOR_2_PIN);
-  sensor_data[3] = digitalRead(SENSOR_3_PIN);
-  sensor_data[4] = digitalRead(SENSOR_4_PIN);
+  sensor_data[0] = digitalRead(SENSOR_0_PIN) ? 0 : 1;
+  sensor_data[1] = digitalRead(SENSOR_1_PIN) ? 0 : 1;
+  sensor_data[2] = digitalRead(SENSOR_2_PIN) ? 0 : 1;
+  sensor_data[3] = digitalRead(SENSOR_3_PIN) ? 0 : 1;
+  sensor_data[4] = digitalRead(SENSOR_4_PIN) ? 0 : 1;
   if (print) {
     // Print data separated by |
     // Serial.print("Sensor data: ");
@@ -66,67 +43,149 @@ void readSensors(bool print = false, bool nice = false) {
   }
 }
 
-int delta_angle = 0;
-int speed = 0;
-bool direction_forward = true;
+namespace Navigation {
+  StackArray<Node> nodes;
+  
+  void addNode(bool left, bool right, bool center) {
+      Node newNode(left, right, center);
+      nodes.push(newNode);
+  }
 
+  const int baseSpeed = 120;
+  const int StampTime = 100;
+
+  void run() {
+    MoveStamp current_move = MoveStamp(0, 0, 0);
+    Node current_node = nodes.peek();
+    while (!nodes.isEmpty()) {
+      current_node = nodes.pop();
+      if (!current_node.left_branch && !current_node.right_branch && !current_node.center_branch) {
+        // If there is no branches left move back node
+        // Here handle logic of moving back maybe it can not work
+        continue;
+      }
+      // if (current_node.moves.isEmpty()) {
+      //   continue;
+      // }
+      
+      // Choose first move based on branches
+      if (current_node.center_branch) {
+        current_move = MoveStamp(baseSpeed, 0, StampTime);
+      } else if (current_node.right_branch) {
+        current_move = MoveStamp(baseSpeed, baseSpeed + 90, StampTime);
+      } else if (current_node.left_branch) {
+        current_move = MoveStamp(baseSpeed, baseSpeed - 90, StampTime);
+      }
+
+      while (true) {
+        move(current_move);
+        current_node.moves.push(current_move);
+        readSensors();
+
+        if (sensor_data[2] == 1 && sensor_data[0] == 0 && sensor_data[1] == 0 && sensor_data[3] == 0 && sensor_data[4] == 0) {
+          // Move forward
+          current_move = MoveStamp(baseSpeed, 0, StampTime);
+          continue;
+        }
+
+        // Here more logic and sensor parsing
+
+        // Condition of returning back
+        if (sensor_data[0] == 0 && sensor_data[1] == 0 && sensor_data[2] == 0 && sensor_data[3] == 0 && sensor_data[4] == 0) {
+          while (!current_node.moves.isEmpty()) {
+            MoveStamp move = current_node.moves.pop();
+            moveReverse(move);
+          }
+        }
+
+        if (sensor_data[1] == 1 && sensor_data[2] == 1 && sensor_data[3] == 1) {
+          // Put back current node to stack
+          nodes.push(current_node);
+          // Create new node and add branches depend on logic
+          nodes.push(Node(true, true, true));
+          break;
+        }
+
+        // remove current branch from node path suggestions
+        if (current_node.moves.isEmpty()) {
+          if (current_node.center_branch) {
+            current_node.center_branch = false;
+          } else if (current_node.right_branch) {
+            current_node.right_branch = false;
+          } else if (current_node.left_branch) {
+            current_node.right_branch = false;
+          }
+          break;
+        }
+        
+      }
+      
+    }
+  }
+};
+
+#pragma region Setup
+
+void setup_sensor() {
+    pinMode(SENSOR_0_PIN, INPUT);
+    pinMode(SENSOR_1_PIN, INPUT);
+    pinMode(SENSOR_2_PIN, INPUT);
+    pinMode(SENSOR_3_PIN, INPUT);
+    pinMode(SENSOR_4_PIN, INPUT);
+    Serial.println("Pins initialized");
+    Navigation::addNode(false, true, false);
+}
+
+void setup() 
+{
+  Serial.begin(115200);
+  setup_sensor();
+  setup_motors();
+}
+
+#pragma endregion
+
+
+
+
+
+const int baseSpeed = 120;
+const int turnAdjust = 40;
+
+int sensor_sum = 0;
 void loop() 
 {
-  delta_angle = 0;
-  speed = 0;
-  direction_forward = true;
-
   readSensors(true, true);
-  if (C0) {
-    // Чітко на лінії — їдемо прямо
-    moveForward(baseSpeed, baseSpeed);
-  }
-  else if (L1) {
-    // Трохи лівіше
-    moveForward(baseSpeed - turnAdjust, baseSpeed + turnAdjust);
-  }
-  else if (R1) {
-    // Трохи правіше
-    moveForward(baseSpeed + turnAdjust, baseSpeed - turnAdjust);
-  }
-  else if (L2) {
-    // Сильно ліво
-    moveForward(baseSpeed - 2 * turnAdjust, baseSpeed + 2 * turnAdjust);
-  }
-  else if (R2) {
-    // Сильно право
-    moveForward(baseSpeed + 2 * turnAdjust, baseSpeed - 2 * turnAdjust);
-  }
-  else {
-    // Лінію втрачено — виконуємо повернення
-    recoverToCenterLine();
-  }
+  sensor_sum = sensor_data[0] + sensor_data[1] + sensor_data[2] + sensor_data[3] + sensor_data[4];
+  // move(100, 100);
+  
+
 
   delay(10);
 }
 
-void recoverToCenterLine() {
-  const int smallTurnSpeed = 100;
-  const int forwardSpeed = 80;
+// const int smallTurnSpeed = 100;
+// const int forwardSpeed = 80;
 
-  while (true) {
-    bool R1;
+// void recoverToCenterLine() {
 
-    if (C0) break; // Знайшли центр — виходимо
+//   while (true) {
 
-    if (L2 || L1) {
-      // Малий поворот ліворуч
-      moveForward(smallTurnSpeed - 40, smallTurnSpeed + 40);
-    }
-    else if (R1 || R2) {
-      // Малий поворот праворуч
-      moveForward(smallTurnSpeed + 40, smallTurnSpeed - 40);
-    }
-    else {
-      // Просто рух вперед, шукаємо
-      moveForward(forwardSpeed, forwardSpeed);
-    }
+//     if (C0) break; // Знайшли центр — виходимо
 
-    delay(100);
-  }
-}
+//     if (L2 || L1) {
+//       // Малий поворот ліворуч
+//       move(smallTurnSpeed - 40, smallTurnSpeed + 40);
+//     }
+//     else if (R1 || R2) {
+//       // Малий поворот праворуч
+//       move(smallTurnSpeed + 40, smallTurnSpeed - 40);
+//     }
+//     else {
+//       // Просто рух вперед, шукаємо
+//       move(forwardSpeed, forwardSpeed);
+//     }
+
+//     delay(100);
+//   }
+// }
