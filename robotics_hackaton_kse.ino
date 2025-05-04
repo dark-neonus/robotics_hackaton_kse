@@ -14,13 +14,48 @@
 #define R1 SENSOR_3_PIN
 #define R2 SENSOR_4_PIN
 
+static const int patterns[8][5] = {
+  {1,1,0,1,1},  // пряма центр
+  {1,1,0,0,1},  // зсув вліво
+  {1,0,0,1,1},  // зсув вправо
+  {0,0,0,1,1},  // крутий поворот вліво
+  {1,1,0,0,0},  // крутий поворот вправо
+  {1,0,0,0,0},  // сильний зсув вправо
+  {0,0,0,0,1},  // сильний зсув вліво
+  {1,1,1,1,1}   // не бачимо лінії
+};
+
 static int sensor_data[5];
+
+// void generateSensorPattern(int (&sensors)[5], int pattern_id) {
+// void generateSensorPattern(int pattern_id) {
+//   for(int i = 0; i < 5; ++i) {
+//       sensors[i] = !(patterns[pattern_id][i]);
+//   }
+// }
+
+void setSensorPattern(int pattern[5]) {
+  sensor_data[0] = pattern[0];
+  sensor_data[1] = pattern[1];
+  sensor_data[2] = pattern[2];
+  sensor_data[3] = pattern[3];
+  sensor_data[4] = pattern[4];
+}
+
+const bool debug = true;
+
 void readSensors(bool print = false, bool nice = false) {
-  sensor_data[0] = digitalRead(SENSOR_0_PIN) ? 0 : 1;
-  sensor_data[1] = digitalRead(SENSOR_1_PIN) ? 0 : 1;
-  sensor_data[2] = digitalRead(SENSOR_2_PIN) ? 0 : 1;
-  sensor_data[3] = digitalRead(SENSOR_3_PIN) ? 0 : 1;
-  sensor_data[4] = digitalRead(SENSOR_4_PIN) ? 0 : 1;
+  if (debug) {
+    int tmp[5] = {0, 0, 1, 0, 0};
+    setSensorPattern(tmp);
+  }
+  else {
+    sensor_data[0] = digitalRead(SENSOR_0_PIN) ? 0 : 1;
+    sensor_data[1] = digitalRead(SENSOR_1_PIN) ? 0 : 1;
+    sensor_data[2] = digitalRead(SENSOR_2_PIN) ? 0 : 1;
+    sensor_data[3] = digitalRead(SENSOR_3_PIN) ? 0 : 1;
+    sensor_data[4] = digitalRead(SENSOR_4_PIN) ? 0 : 1;
+  }
   if (print) {
     // Print data separated by |
     // Serial.print("Sensor data: ");
@@ -148,25 +183,6 @@ void setup()
 #pragma endregion
 
 
-
-static const int patterns[8][5] = {
-    {1,1,0,1,1},  // пряма центр
-    {1,1,0,0,1},  // зсув вліво
-    {1,0,0,1,1},  // зсув вправо
-    {0,0,0,1,1},  // крутий поворот вліво
-    {1,1,0,0,0},  // крутий поворот вправо
-    {1,0,0,0,0},  // сильний зсув вправо
-    {0,0,0,0,1},  // сильний зсув вліво
-    {1,1,1,1,1}   // не бачимо лінії
-};
-
-void generateSensorPattern(int (&sensors)[5], int pattern_id) {
-    for(int i = 0; i < 5; ++i) {
-        sensors[i] = !(patterns[pattern_id][i]);
-    }
-}
-
-
 const int baseSpeed = 120;
 const int turnAdjust = 40;
 
@@ -177,39 +193,14 @@ void loop()
   // sensor_sum = sensor_data[0] + sensor_data[1] + sensor_data[2] + sensor_data[3] + sensor_data[4];
   // // move(100, 100);
   
-  // Navigation::run();
-  digitalWrite(MOTOR_RIGHT_PIN1, HIGH);
-  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
-  digitalWrite(MOTOR_LEFT_PIN1, HIGH);
-  digitalWrite(MOTOR_LEFT_PIN2, LOW);
-  analogWrite(MOTOR_RIGHT_ANALOG_PIN, 150);
-  analogWrite(MOTOR_LEFT_ANALOG_PIN, 150);
+  Navigation::run();
+  // digitalWrite(MOTOR_RIGHT_PIN1, HIGH);
+  // digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+  // digitalWrite(MOTOR_LEFT_PIN1, HIGH);
+  // digitalWrite(MOTOR_LEFT_PIN2, LOW);
+  // analogWrite(MOTOR_RIGHT_ANALOG_PIN, 150);
+  // analogWrite(MOTOR_LEFT_ANALOG_PIN, 150);
 
   delay(10);
 }
 
-// const int smallTurnSpeed = 100;
-// const int forwardSpeed = 80;
-
-// void recoverToCenterLine() {
-
-//   while (true) {
-
-//     if (C0) break; // Знайшли центр — виходимо
-
-//     if (L2 || L1) {
-//       // Малий поворот ліворуч
-//       move(smallTurnSpeed - 40, smallTurnSpeed + 40);
-//     }
-//     else if (R1 || R2) {
-//       // Малий поворот праворуч
-//       move(smallTurnSpeed + 40, smallTurnSpeed - 40);
-//     }
-//     else {
-//       // Просто рух вперед, шукаємо
-//       move(forwardSpeed, forwardSpeed);
-//     }
-
-//     delay(100);
-//   }
-// }
