@@ -22,6 +22,13 @@ void setup_motors() {
   Serial.println("Motors initialized");
 }
 
+void stopMotors() {
+  digitalWrite(MOTOR_RIGHT_PIN1, LOW);
+  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+  digitalWrite(MOTOR_LEFT_PIN1, LOW);
+  digitalWrite(MOTOR_LEFT_PIN2, LOW);
+}
+
 void moveForward(int speed) {
   analogWrite(MOTOR_RIGHT_ANALOG_PIN, speed);
   analogWrite(MOTOR_LEFT_ANALOG_PIN, speed);
@@ -58,7 +65,7 @@ void turnByAngle(int angle, int speed) {
   int leftMotor = dir * speed;
   int rightMotor = -dir * speed;
 
-  setMotors(stamp.speed, stamp.speed);
+  setMotors(speed, speed);
   delay(duration);
   stopMotors();
 }
@@ -147,12 +154,7 @@ void moveReverse(MoveStamp stamp) {
 //   digitalWrite(MOTOR_LEFT_PIN2, LOW);
 // }
 
-void stopMotors() {
-  digitalWrite(MOTOR_RIGHT_PIN1, LOW);
-  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
-  digitalWrite(MOTOR_LEFT_PIN1, LOW);
-  digitalWrite(MOTOR_LEFT_PIN2, LOW);
-}
+
 
 // void rotate180() {
 //   // analogWrite(MOTOR_RIGHT_PIN1, 128)
@@ -168,14 +170,14 @@ void stopMotors() {
 //   digitalWrite(MOTOR_LEFT_PIN2, LOW);
 // }
 
-void rotateClockwise(int rotate_speed) {
-  analogWrite(MOTOR_RIGHT_ANALOG_PIN, rotate_speed);
-  analogWrite(MOTOR_LEFT_ANALOG_PIN, rotate_speed);
-  digitalWrite(motorRightPin1, LOW);
-  digitalWrite(motorRightPin2, HIGH);
-  digitalWrite(motorLeftPin1, HIGH);
-  digitalWrite(motorLeftPin2, LOW);
- }
+// void rotateClockwise(int rotate_speed) {
+//   analogWrite(MOTOR_RIGHT_ANALOG_PIN, rotate_speed);
+//   analogWrite(MOTOR_LEFT_ANALOG_PIN, rotate_speed);
+//   digitalWrite(motorRightPin1, LOW);
+//   digitalWrite(motorRightPin2, HIGH);
+//   digitalWrite(motorLeftPin1, HIGH);
+//   digitalWrite(motorLeftPin2, LOW);
+//  }
 
 
 //  void rotateCounterClockwise(int rotate_speed) {

@@ -46,10 +46,10 @@ void readSensors(bool print = false, bool nice = false) {
 namespace Navigation {
   StackArray<Node> nodes;
   
-  // void addNode(bool left, bool right, bool center) {
-  //     Node newNode(left, right, center);
-  //     nodes.push(newNode);
-  // }
+  void addNode(bool left, bool right, bool center) {
+      Node newNode(left, right, center);
+      nodes.push(newNode);
+  }
 
   const int baseSpeed = 120;
   const int StampTime = 100;
@@ -149,6 +149,22 @@ void setup()
 
 
 
+static const int patterns[8][5] = {
+    {1,1,0,1,1},  // пряма центр
+    {1,1,0,0,1},  // зсув вліво
+    {1,0,0,1,1},  // зсув вправо
+    {0,0,0,1,1},  // крутий поворот вліво
+    {1,1,0,0,0},  // крутий поворот вправо
+    {1,0,0,0,0},  // сильний зсув вправо
+    {0,0,0,0,1},  // сильний зсув вліво
+    {1,1,1,1,1}   // не бачимо лінії
+};
+
+void generateSensorPattern(int (&sensors)[5], int pattern_id) {
+    for(int i = 0; i < 5; ++i) {
+        sensors[i] = !(patterns[pattern_id][i]);
+    }
+}
 
 
 const int baseSpeed = 120;
