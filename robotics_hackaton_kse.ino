@@ -46,10 +46,10 @@ void readSensors(bool print = false, bool nice = false) {
 namespace Navigation {
   StackArray<Node> nodes;
   
-  // void addNode(bool left, bool right, bool center) {
-  //     Node newNode(left, right, center);
-  //     nodes.push(newNode);
-  // }
+  void addNode(bool left, bool right, bool center) {
+      Node newNode(left, right, center);
+      nodes.push(newNode);
+  }
 
   const int baseSpeed = 120;
   const int StampTime = 100;
@@ -157,11 +157,17 @@ const int turnAdjust = 40;
 int sensor_sum = 0;
 void loop() 
 {
-  readSensors(true, true);
-  sensor_sum = sensor_data[0] + sensor_data[1] + sensor_data[2] + sensor_data[3] + sensor_data[4];
-  // move(100, 100);
+  // readSensors(true, true);
+  // sensor_sum = sensor_data[0] + sensor_data[1] + sensor_data[2] + sensor_data[3] + sensor_data[4];
+  // // move(100, 100);
   
-  Navigation::run();
+  // Navigation::run();
+  digitalWrite(MOTOR_RIGHT_PIN1, HIGH);
+  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+  digitalWrite(MOTOR_LEFT_PIN1, HIGH);
+  digitalWrite(MOTOR_LEFT_PIN2, LOW);
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, 150);
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, 150);
 
   delay(10);
 }

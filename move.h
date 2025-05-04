@@ -3,11 +3,11 @@
 
 #include "navigation.h"
 
-#define MOTOR_RIGHT_PIN1 12
-#define MOTOR_RIGHT_PIN2 13
+#define MOTOR_RIGHT_PIN1 7
+#define MOTOR_RIGHT_PIN2 8
 
-#define MOTOR_LEFT_PIN1 7
-#define MOTOR_LEFT_PIN2 8
+#define MOTOR_LEFT_PIN1 12
+#define MOTOR_LEFT_PIN2 13
 
 #define MOTOR_RIGHT_ANALOG_PIN 10
 #define MOTOR_LEFT_ANALOG_PIN 11
