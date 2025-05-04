@@ -37,14 +37,14 @@ int getTurnTime360(int pwm) {
 }
 
 void setMotors(int leftSpeed, int rightSpeed) {
-  analogWrite(ENA, constrain(abs(leftSpeed), 0, 255));
-  analogWrite(ENB, constrain(abs(rightSpeed), 0, 255));
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, constrain(abs(leftSpeed), 0, 255));
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, constrain(abs(rightSpeed), 0, 255));
 
-  digitalWrite(IN1, leftSpeed >= 0 ? HIGH : LOW);
-  digitalWrite(IN2, leftSpeed >= 0 ? LOW : HIGH);
+  digitalWrite(MOTOR_RIGHT_PIN1, leftSpeed >= 0 ? HIGH : LOW);
+  digitalWrite(MOTOR_RIGHT_PIN2, leftSpeed >= 0 ? LOW : HIGH);
 
-  digitalWrite(IN3, rightSpeed >= 0 ? HIGH : LOW);
-  digitalWrite(IN4, rightSpeed >= 0 ? LOW : HIGH);
+  digitalWrite(MOTOR_LEFT_PIN1, rightSpeed >= 0 ? HIGH : LOW);
+  digitalWrite(MOTOR_LEFT_PIN2, rightSpeed >= 0 ? LOW : HIGH);
 }
 
 void turnByAngle(int angle, int speed) {
