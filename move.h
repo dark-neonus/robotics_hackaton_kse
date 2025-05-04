@@ -22,14 +22,117 @@ void setup_motors() {
   Serial.println("Motors initialized");
 }
 
+void stopMotors() {
+  digitalWrite(MOTOR_RIGHT_PIN1, LOW);
+  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+  digitalWrite(MOTOR_LEFT_PIN1, LOW);
+  digitalWrite(MOTOR_LEFT_PIN2, LOW);
+}
+
+void moveForward(int speed) {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, speed);
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, speed);
+  digitalWrite(MOTOR_RIGHT_PIN1, HIGH);
+  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+  digitalWrite(MOTOR_LEFT_PIN1, HIGH);
+  digitalWrite(MOTOR_LEFT_PIN2, LOW);
+}
+
+int getTurnTime360(int pwm) {
+  // A ≈ 138000 підібрано з експериментальних даних
+  return 138000 / pwm;
+}
+
+void setMotors(int leftSpeed, int rightSpeed) {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, constrain(abs(leftSpeed), 0, 255));
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, constrain(abs(rightSpeed), 0, 255));
+
+  digitalWrite(MOTOR_RIGHT_PIN1, leftSpeed >= 0 ? HIGH : LOW);
+  digitalWrite(MOTOR_RIGHT_PIN2, leftSpeed >= 0 ? LOW : HIGH);
+
+  digitalWrite(MOTOR_LEFT_PIN1, rightSpeed >= 0 ? HIGH : LOW);
+  digitalWrite(MOTOR_LEFT_PIN2, rightSpeed >= 0 ? LOW : HIGH);
+}
+
+void turnByAngle(int angle, int speed) {
+  if (angle == 0 || speed <= 0) return;
+
+  int dir = angle > 0 ? 1 : -1;  // 1 = праворуч, -1 = ліворуч
+  int turnTime360 = getTurnTime360(speed);
+  int duration = abs(angle) * turnTime360 / 360;
+
+  // Для танкового повороту: один мотор вперед, інший назад
+  int leftMotor = dir * speed;
+  int rightMotor = -dir * speed;
+
+  setMotors(speed, speed);
+  delay(duration);
+  stopMotors();
+}
+
 // Move the robot using data from moveStamp
 void move(MoveStamp stamp) {
-  // Implementation here
+  moveForward(stamp.speed);
+  delay(stamp.time);
+  stopMotors();
+  turnByAngle(stamp.delta_rotation, stamp.speed);
+  delay(stamp.time);
+  stopMotors();
+  // if (stamp.delta_rotation == 0) {
+  //   // Move forward or backward
+  //   moveForward(stamp.speed);
+  //   delay(stamp.time);
+  //   stopMotors();
+  // } else if (stamp.delta_rotation > 0) {
+  //   // Rotate clockwise
+  //   moveForward(stamp.speed);
+  //   rotateClockwise(stamp.speed, stamp.time);
+  //   delay(stamp.time);
+  //   stopMotors();
+  // } else {
+  //   // Rotate counter-clockwise
+  //   moveForward(stamp.speed);
+  //   rotateCounterClockwise(-stamp.delta_rotation);
+  //   delay(stamp.time);
+  //   stopMotors();
+  // }
+
+}
+void moveBackward(int speed) {
+  analogWrite(MOTOR_RIGHT_ANALOG_PIN, speed);
+  analogWrite(MOTOR_LEFT_ANALOG_PIN, speed);
+  digitalWrite(MOTOR_RIGHT_PIN1, LOW);
+  digitalWrite(MOTOR_RIGHT_PIN2, HIGH);
+  digitalWrite(MOTOR_LEFT_PIN1, LOW);
+  digitalWrite(MOTOR_LEFT_PIN2, HIGH);
 }
 
 // Takes moveStamp and reverse it
 void moveReverse(MoveStamp stamp) {
-  // Implementation here
+  moveBackward(stamp.speed);
+  delay(stamp.time);
+  stopMotors();
+  turnByAngle(-stamp.delta_rotation, stamp.speed);
+  delay(stamp.time);
+  stopMotors();
+  // if (stamp.delta_rotation == 0) {
+  //   // Move forward or backward
+  //   moveForward(-stamp.speed);
+  //   delay(stamp.time);
+  //   stopMotors();
+  // } else if (stamp.delta_rotation > 0) {
+  //   // Rotate clockwise
+  //   moveForward(-stamp.speed);
+  //   rotateClockwise(-stamp.speed, stamp.time);
+  //   delay(stamp.time);
+  //   stopMotors();
+  // } else {
+  //   // Rotate counter-clockwise
+  //   moveForward(-stamp.speed);
+  //   rotateCounterClockwise(-stamp.delta_rotation);
+  //   delay(stamp.time);
+  //   stopMotors();
+  // }
 }
 
 // void forward(int speed = 150) {
@@ -51,12 +154,7 @@ void moveReverse(MoveStamp stamp) {
 //   digitalWrite(MOTOR_LEFT_PIN2, LOW);
 // }
 
-// void stopMotors() {
-//   digitalWrite(MOTOR_RIGHT_PIN1, LOW);
-//   digitalWrite(MOTOR_RIGHT_PIN2, LOW);
-//   digitalWrite(MOTOR_LEFT_PIN1, LOW);
-//   digitalWrite(MOTOR_LEFT_PIN2, LOW);
-// }
+
 
 // void rotate180() {
 //   // analogWrite(MOTOR_RIGHT_PIN1, 128)
