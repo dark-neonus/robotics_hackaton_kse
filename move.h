@@ -36,6 +36,17 @@ int getTurnTime360(int pwm) {
   return 138000 / pwm;
 }
 
+void setMotors(int leftSpeed, int rightSpeed) {
+  analogWrite(ENA, constrain(abs(leftSpeed), 0, 255));
+  analogWrite(ENB, constrain(abs(rightSpeed), 0, 255));
+
+  digitalWrite(IN1, leftSpeed >= 0 ? HIGH : LOW);
+  digitalWrite(IN2, leftSpeed >= 0 ? LOW : HIGH);
+
+  digitalWrite(IN3, rightSpeed >= 0 ? HIGH : LOW);
+  digitalWrite(IN4, rightSpeed >= 0 ? LOW : HIGH);
+}
+
 void turnByAngle(int angle, int speed) {
   if (angle == 0 || speed <= 0) return;
 
@@ -47,7 +58,7 @@ void turnByAngle(int angle, int speed) {
   int leftMotor = dir * speed;
   int rightMotor = -dir * speed;
 
-  setMotors(leftMotor, rightMotor);
+  setMotors(stamp.speed, stamp.speed);
   delay(duration);
   stopMotors();
 }
@@ -136,12 +147,12 @@ void moveReverse(MoveStamp stamp) {
 //   digitalWrite(MOTOR_LEFT_PIN2, LOW);
 // }
 
-// void stopMotors() {
-//   digitalWrite(MOTOR_RIGHT_PIN1, LOW);
-//   digitalWrite(MOTOR_RIGHT_PIN2, LOW);
-//   digitalWrite(MOTOR_LEFT_PIN1, LOW);
-//   digitalWrite(MOTOR_LEFT_PIN2, LOW);
-// }
+void stopMotors() {
+  digitalWrite(MOTOR_RIGHT_PIN1, LOW);
+  digitalWrite(MOTOR_RIGHT_PIN2, LOW);
+  digitalWrite(MOTOR_LEFT_PIN1, LOW);
+  digitalWrite(MOTOR_LEFT_PIN2, LOW);
+}
 
 // void rotate180() {
 //   // analogWrite(MOTOR_RIGHT_PIN1, 128)
